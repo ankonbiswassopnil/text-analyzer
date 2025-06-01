@@ -1,11 +1,10 @@
 import express from 'express';
-import bodyParser from 'body-parser';
 import textRoutes from './routes/textRoutes'; 
 
 const app = express();
+
+// Parse JSON bodies
 app.use(express.json());
-// Middleware
-app.use(bodyParser.json());
 
 // Routes
 app.use('/api', textRoutes); 

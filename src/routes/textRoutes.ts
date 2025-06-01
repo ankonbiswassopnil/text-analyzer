@@ -1,19 +1,64 @@
 import { Router } from 'express';
-import { 
+import {
   createText,
   getText,
   updateText,
   deleteText,
-  getAnalysis 
+  getAnalysis,
 } from '../controllers/textController';
+
+import {
+  validateCreateText,
+  validateUpdateText,
+  validateTextIdParam,
+} from '../validators/textValidators';
+
+import { validateRequest } from '../middleware/validateRequest';
+
+// Match the controller's type definitions
+interface TextParams {
+  id: string;
+}
+
+interface TextBody {
+  content: string;
+}
 
 const router = Router();
 
+router.post<{}, any, TextBody>(
+  '/texts',
+  validateCreateText,
+  validateRequest,
+  createText
+);
 
-router.post('/texts', createText);
-router.get('/texts/:id', getText);
-router.put('/texts/:id', updateText);
-router.delete('/texts/:id', deleteText);
-router.get('/texts/:id/analysis', getAnalysis);
+router.get<{ id: string }>(
+  '/texts/:id',
+  validateTextIdParam,
+  validateRequest,
+  getText
+);
+
+router.put<{ id: string }, any, { content: string }>(
+  '/texts/:id',
+  validateUpdateText,
+  validateRequest,
+  updateText
+);
+
+router.delete<{ id: string }>(
+  '/texts/:id',
+  validateTextIdParam,
+  validateRequest,
+  deleteText
+);
+
+router.get<{ id: string }>(
+  '/texts/:id/analysis',
+  validateTextIdParam,
+  validateRequest,
+  getAnalysis
+);
 
 export default router;
