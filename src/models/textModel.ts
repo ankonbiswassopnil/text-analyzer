@@ -21,5 +21,21 @@ export const TextModel = {
         [id]
         );
         return rows[0] || null;
-    }
+    },
+
+    async update(id: number, content: string): Promise<Text | null> {
+    const { rows } = await pool.query(
+      'UPDATE texts SET content = $1 WHERE id = $2 RETURNING *',
+      [content, id]
+    );
+    return rows[0] || null;
+  },
+
+  async delete(id: number): Promise<boolean> {
+    const { rowCount } = await pool.query(
+      'DELETE FROM texts WHERE id = $1',
+      [id]
+    );
+    return (rowCount ?? 0) > 0;
+  }
 };
