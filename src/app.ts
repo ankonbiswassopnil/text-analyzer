@@ -2,9 +2,13 @@ import express from 'express';
 import path from 'path';
 import textRoutes from './routes/textRoutes'; 
 import authRoutes from './routes/auth';
-import WebRoutes from './routes/web'; // Assuming you have a web route for rendering views
+import WebRoutes from './routes/web'; 
+import { authenticateJWT } from './middleware/authenticateJWT';
+import cookieParser from 'cookie-parser';
 
 const app = express();
+
+app.use(cookieParser());
 
 // Parse JSON bodies
 app.use(express.json());
@@ -12,7 +16,7 @@ app.use(express.json());
 // Routes
 app.use('/api', textRoutes); 
 app.use('/auth', authRoutes);
-app.use('/', WebRoutes);
+app.use('/', authenticateJWT, WebRoutes);
 
 // Set the views directory
 app.set('views', path.join(__dirname, 'views'));

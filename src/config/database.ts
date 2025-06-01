@@ -5,7 +5,7 @@ const isTest = process.env.NODE_ENV === 'test';
 export const pool = new Pool({
   user: process.env.PGUSER || 'postgres',
   host: process.env.PGHOST || 'localhost',
-  database: isTest ? 'text_analyzer_test' : 'text_analyzer',
+  database: isTest ? 'text_analyzer_test' : 'text_analyzer_test',
   password: process.env.PGPASSWORD || 'kratos040471',
   port: Number(process.env.PGPORT) || 5432,
 });

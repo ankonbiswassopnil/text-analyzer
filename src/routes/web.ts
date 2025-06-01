@@ -2,14 +2,13 @@ import { Router, Request, Response } from 'express';
 
 const router = Router();
 
-// Placeholder dashboard route
 router.get('/dashboard', (req: Request, res: Response) => {
-  // In future, you’ll check req.session.user here
-  const user = {
-    name: 'John Doe',
-    email: 'johndoe@example.com',
-    picture: 'https://via.placeholder.com/100',
-  };
+  // Use the user data from the JWT payload set by authenticateJWT middleware
+  const user = req.user;
+
+  if (!user) {
+    return res.redirect('/auth/login');
+  }
 
   res.render('dashboard', { user });
 });

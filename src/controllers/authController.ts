@@ -51,11 +51,17 @@ export const handleGoogleCallback = async (req: Request, res: Response): Promise
       id: user.id,
       googleId: user.google_id,
       email: user.email,
+      avatarUrl: user.avatar_url,
       name: user.name,
     };
 
     const token = jwt.sign(tokenPayload, JWT_SECRET, { expiresIn: '7d' });
-
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production', // only over HTTPS in production
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
     res.json({ success: true, token, user });
   } catch (error) {
     console.error('Error verifying Google ID token:', error);
