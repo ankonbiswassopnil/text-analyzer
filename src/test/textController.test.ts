@@ -18,11 +18,4 @@ describe('Text Controller', () => {
   test('App should be defined', () => {
     expect(app).toBeDefined();
   });
-
-  test('POST /texts - should 404 until implemented', async () => {
-    const response = await request(app)
-      .post('/texts')
-      .send({ content: 'Test content' });
-    expect(response.status).toBe(404); // Expecting 404 since route doesn't exist yet
-  });
 });
