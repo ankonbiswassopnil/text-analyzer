@@ -1,0 +1,26 @@
+@baseUrl = http://localhost/api
+
+### 🔹 Create a new text
+POST {{baseUrl}}/texts
+Content-Type: application/json
+
+{
+  "content": "This is a valid content string with more than 10 characters."
+}
+
+### 🔹 Get a text by ID
+GET {{baseUrl}}/texts/1
+
+### 🔹 Update a text by ID
+PUT {{baseUrl}}/texts/3
+Content-Type: application/json
+
+{
+  "content": "This is the updated content for the text."
+}
+
+### 🔹 Delete a text by ID
+DELETE {{baseUrl}}/texts/4
+
+### 🔹 Get analysis for a text by ID
+GET {{baseUrl}}/texts/5/analysis

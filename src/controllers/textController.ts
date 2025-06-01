@@ -75,7 +75,7 @@ export const deleteText: RequestHandler<TextParams> = async (req, res) => {
     }
 
     // 204 No Content has no body, so just send status
-    res.status(204).send();
+    res.status(202).send({ status: false, error: 'Successfully Deleted' });
   } catch (error) {
     res.status(500).json({ status: false, error: 'Internal server error' });
   }
