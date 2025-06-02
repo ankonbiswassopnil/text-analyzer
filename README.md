@@ -1,1 +1,384 @@
-# text-analyzer
+# ✨ Text Analysis & Authentication API
+
+A modern Node.js + Express application that combines Google OAuth authentication with powerful text analysis capabilities. Users can securely log in and analyze text with detailed statistics including word count, sentence analysis, and more.
+
+![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
+![Express.js](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
+![Google OAuth](https://img.shields.io/badge/Google%20OAuth-4285F4?style=for-the-badge&logo=google&logoColor=white)
+
+---
+
+## 🚀 Features
+
+- ✅ **Google Sign-In** using OAuth2
+- ✅ **JWT token** generation & verification
+- ✅ **Secure token storage** via `httpOnly` cookies
+- ✅ **Protected API routes** for text analysis
+- ✅ **EJS-based frontend** dashboard with dynamic data rendering
+- ✅ **Comprehensive text analysis**: character count, word count, sentence count, paragraph count, and longest words
+- ✅ **Responsive design** with modern UI/UX
+- ✅ **Session management** with automatic token refresh
+
+---
+
+## 🧰 Tech Stack
+
+| Technology | Purpose |
+|------------|---------|
+| **Node.js** | Runtime environment |
+| **Express.js** | Web framework |
+| **Google OAuth2** | Authentication |
+| **JWT** | Token management |
+| **EJS** | Template engine |
+| **PostgreSQL** | Database |
+| **Cookie-parser** | Cookie handling |
+| **dotenv** | Environment variables |
+
+---
+
+## ⚙️ Prerequisites
+
+Before running the project, ensure you have:
+
+- **Node.js** (v16 or newer) - [Download here](https://nodejs.org/)
+- **npm** or **yarn** package manager
+- **PostgreSQL** instance (local or cloud) - [Get started](https://www.postgresql.org/download/)
+- **Google Cloud OAuth2 credentials** - [Setup guide](https://developers.google.com/identity/protocols/oauth2)
+
+---
+
+## 📦 Installation
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/ankonbiswassopnil/text-analyzer.git
+cd text-analyzer
+```
+
+### 2. Install Dependencies
+
+```bash
+npm install
+```
+
+### 3. Environment Setup
+
+Create a `.env` file in the root directory:
+
+```env
+# Server Configuration
+PORT=3000
+NODE_ENV=development
+
+# Database Configuration
+DATABASE_URL=postgresql://username:password@localhost:5432/text_analyzer_db
+
+# Google OAuth2 Credentials
+GOOGLE_CLIENT_ID=your_google_client_id_here
+GOOGLE_CLIENT_SECRET=your_google_client_secret_here
+GOOGLE_REDIRECT_URI=http://localhost:3000/auth/google/callback
+
+# JWT Configuration
+JWT_SECRET=your_super_secret_jwt_key_here
+JWT_EXPIRES_IN=7d
+
+# Cookie Configuration
+COOKIE_SECRET=your_cookie_secret_here
+```
+
+### 4. Database Setup
+
+Create the PostgreSQL database and run migrations:
+
+```bash
+# Create database
+createdb text_analyzer_db
+
+# Run database migrations (if using a migration tool)
+npm run migrate
+
+# Or manually create tables using your preferred method
+```
+
+### 5. Google OAuth2 Setup
+
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Create a new project or select existing one
+3. Enable the Google+ API
+4. Create OAuth2 credentials
+5. Add authorized redirect URIs:
+   - `http://localhost:3000/auth/google/callback` (development)
+   - `https://yourdomain.com/auth/google/callback` (production)
+
+---
+
+## 🚀 Running the Project
+
+### Development Mode
+
+```bash
+npm run dev
+```
+
+The server will start on `http://localhost:3000` with hot reloading enabled.
+
+### Production Mode
+
+```bash
+npm start
+```
+
+### Using PM2 (Recommended for Production)
+
+```bash
+# Install PM2 globally
+npm install -g pm2
+
+# Start the application
+pm2 start ecosystem.config.js
+
+# View logs
+pm2 logs
+
+# Stop the application
+pm2 stop text-analyzer
+```
+
+---
+
+## 📁 Project Structure
+
+```
+text-analyzer/
+├── 📁 config/
+│   ├── database.js          # Database configuration
+│   └── oauth.js             # Google OAuth setup
+├── 📁 controllers/
+│   ├── authController.js    # Authentication logic
+│   └── textController.js    # Text analysis logic
+├── 📁 middleware/
+│   ├── auth.js              # JWT verification middleware
+│   └── validation.js        # Input validation
+├── 📁 models/
+│   └── User.js              # User model
+├── 📁 routes/
+│   ├── auth.js              # Authentication routes
+│   ├── api.js               # API routes
+│   └── index.js             # Main routes
+├── 📁 views/
+│   ├── layouts/
+│   │   └── main.ejs         # Main layout template
+│   ├── dashboard.ejs        # User dashboard
+│   ├── login.ejs            # Login page
+│   └── analyze.ejs          # Text analysis page
+├── 📁 public/
+│   ├── css/
+│   ├── js/
+│   └── images/
+├── 📁 utils/
+│   ├── textAnalyzer.js      # Text analysis utilities
+│   └── tokenManager.js      # JWT utilities
+├── app.js                   # Express app setup
+├── server.js                # Server entry point
+├── package.json
+└── .env.example
+```
+
+---
+
+## 🔌 API Endpoints
+
+### Authentication Routes
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/auth/google` | Initiate Google OAuth |
+| `GET` | `/auth/google/callback` | Google OAuth callback |
+| `POST` | `/auth/logout` | User logout |
+| `GET` | `/auth/me` | Get current user info |
+
+### Text Analysis Routes
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/analyze` | Analyze text content |
+| `GET` | `/api/history` | Get analysis history |
+| `DELETE` | `/api/history/:id` | Delete analysis record |
+
+
+---
+
+## 🎨 Frontend Features
+
+### Dashboard
+
+The user dashboard provides:
+
+- **Welcome section** with user profile information
+- **Quick text analysis** form
+- **Analysis history** with pagination
+- **Statistics overview** with visual charts
+- **Export functionality** for analysis results
+
+### Text Analysis Interface
+
+- **Real-time text input** with character counter
+- **Instant analysis results** display
+- **Analysis history** with search and filter
+- **Responsive design** for mobile and desktop
+
+---
+
+## 🛡️ Security Features
+
+- **JWT-based authentication** with secure token storage
+- **HTTP-only cookies** to prevent XSS attacks
+- **CSRF protection** middleware
+- **Rate limiting** on API endpoints
+- **Input validation** and sanitization
+
+
+## 📊 Text Analysis Features
+
+The application provides comprehensive text analysis including:
+
+### Basic Statistics
+- **Character count** (with/without spaces)
+- **Word count** with intelligent word boundary detection
+- **Sentence count** using advanced sentence parsing
+- **Paragraph count** based on line breaks
+
+### Advanced Analysis
+- **Longest words** extraction and ranking
+- **Average words per sentence** calculation
+- **Reading time estimation** based on average reading speed
+- **Keyword density** analysis
+- **Readability score** calculation
+
+
+## 🧪 Testing
+
+### Running Tests
+
+```bash
+# Run all tests
+npm test
+
+# Run tests with coverage
+npm run test:coverage
+
+# Run tests in watch mode
+npm run test:watch
+```
+
+
+## 🤝 Contributing
+
+We welcome contributions! Please follow these steps:
+
+1. **Fork the repository**
+2. **Create a feature branch**: `git checkout -b feature/amazing-feature`
+3. **Commit your changes**: `git commit -m 'Add amazing feature'`
+4. **Push to the branch**: `git push origin feature/amazing-feature`
+5. **Open a Pull Request**
+
+### Contribution Guidelines
+
+- Follow the existing code style
+- Add tests for new features
+- Update documentation as needed
+- Ensure all tests pass before submitting
+
+---
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+```
+MIT License
+
+Copyright (c) 2025 Ankon Biswas Sopnil
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+```
+
+---
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+**Google OAuth not working:**
+- Verify your Google Client ID and Secret
+- Check redirect URI configuration
+- Ensure Google+ API is enabled
+
+**Database connection issues:**
+- Confirm PostgreSQL is running
+- Check database URL format
+- Verify database credentials
+
+**JWT token issues:**
+- Check JWT secret configuration
+- Verify token expiration settings
+- Clear browser cookies and try again
+
+### Getting Help
+
+- **Create an issue** on GitHub
+- **Check existing issues** for solutions
+- **Join our community** discussions
+
+---
+
+## 📈 Roadmap
+
+- [ ] **Advanced text analytics** (sentiment analysis, keyword extraction)
+- [ ] **Multiple language support** for text analysis
+- [ ] **API rate limiting** and usage analytics
+- [ ] **Real-time collaboration** features
+- [ ] **Export to multiple formats** (PDF, Word, etc.)
+- [ ] **Text comparison** functionality
+- [ ] **Mobile app** development
+- [ ] **Plugin system** for custom analyzers
+
+---
+
+## 👥 Authors
+
+- **Ankon Biswas Sopnil** - *Initial work* - [@ankonbiswassopnil](https://github.com/ankonbiswassopnil)
+
+---
+
+## 🙏 Acknowledgments
+
+- Google OAuth2 documentation and community
+- Express.js and Node.js communities
+- All contributors and users of this project
+- Open source libraries that made this project possible
+
+---
+
+## 📞 Support
+
+If you like this project, please consider:
+
+- ⭐ **Starring** the repository
+- 🐛 **Reporting bugs** or suggesting features
+- 🤝 **Contributing** to the codebase
+- 📢 **Sharing** with others
+
+---
+
+**Made with ❤️ by [Ankon Biswas Sopnil](https://github.com/ankonbiswassopnil)**
