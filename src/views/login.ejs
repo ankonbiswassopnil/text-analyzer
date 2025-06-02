@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Login - Text Analyzer</title>
+  
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  
+  <!-- Google Sign-In API -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  
+  <style>
+    /* Custom Variables */
+    :root {
+      --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      --accent-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      --dark-gradient: linear-gradient(135deg, #0c0c0c 0%, #1a1a1a 100%);
+      --text-primary: #2d3748;
+      --text-secondary: #718096;
+      --border-light: rgba(255, 255, 255, 0.1);
+      --shadow-soft: 0 10px 25px rgba(0, 0, 0, 0.1);
+      --shadow-strong: 0 20px 40px rgba(0, 0, 0, 0.15);
+      --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.6;
+      color: var(--text-primary);
+      overflow-x: hidden;
+    }
+
+    /* Main Layout */
+    .login-wrapper {
+      min-height: 100vh;
+      display: flex;
+    }
+
+    /* Left Panel - Hero Section */
+    .hero-panel {
+      background: var(--primary-gradient);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 0;
+    }
+
+    .hero-panel::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="white" stroke-width="0.5" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+      animation: float 20s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      color: white;
+      text-align: center;
+      padding: 4rem 3rem;
+    }
+
+    .hero-icon {
+      width: 120px;
+      height: 120px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 2rem;
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border-light);
+      transition: var(--transition);
+    }
+
+    .hero-icon:hover {
+      transform: translateY(-5px) scale(1.02);
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .hero-icon i {
+      font-size: 3.5rem;
+      background: linear-gradient(45deg, #fff, #f0f8ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-title {
+      font-size: 3.5rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+      letter-spacing: -2px;
+      line-height: 1.1;
+    }
+
+    .hero-subtitle {
+      font-size: 1.25rem;
+      font-weight: 400;
+      opacity: 0.95;
+      margin-bottom: 3rem;
+      line-height: 1.5;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-top: 3rem;
+    }
+
+    .feature-item {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 1.5rem;
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border-light);
+      transition: var(--transition);
+      text-align: left;
+    }
+
+    .feature-item:hover {
+      transform: translateY(-3px);
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .feature-item i {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      display: block;
+      opacity: 0.9;
+    }
+
+    .feature-item h4 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .feature-item p {
+      font-size: 0.9rem;
+      opacity: 0.8;
+      line-height: 1.4;
+    }
+
+    .stats-row {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 3rem;
+      padding-top: 3rem;
+      border-top: 1px solid var(--border-light);
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: 800;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+      font-size: 0.9rem;
+      opacity: 0.8;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* Right Panel - Login Form */
+    .login-panel {
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      position: relative;
+    }
+
+    .login-panel::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 100px;
+      height: 100px;
+      background: var(--accent-gradient);
+      border-radius: 0 0 0 50px;
+      opacity: 0.1;
+    }
+
+    .login-form-container {
+      width: 100%;
+      max-width: 480px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .login-header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .login-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+      letter-spacing: -1px;
+    }
+
+    .login-subtitle {
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+      font-weight: 400;
+    }
+
+    .google-signin-wrapper {
+      margin: 2rem 0;
+      text-align: center;
+    }
+
+    .g_id_signin {
+      display: flex !important;
+      justify-content: center !important;
+      margin-bottom: 1rem;
+    }
+
+    .g_id_signin iframe {
+      border-radius: 12px !important;
+      transition: var(--transition) !important;
+      box-shadow: var(--shadow-soft) !important;
+    }
+
+    .g_id_signin:hover iframe {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-strong) !important;
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      margin: 2rem 0;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #e2e8f0;
+    }
+
+    .divider span {
+      padding: 0 1.5rem;
+      background: white;
+      font-weight: 500;
+    }
+
+    .benefits-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    .benefits-list li {
+      display: flex;
+      align-items: center;
+      padding: 0.75rem 0;
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+    }
+
+    .benefits-list li i {
+      color: #10b981;
+      margin-right: 0.75rem;
+      font-size: 1rem;
+    }
+
+    .trust-indicators {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 2rem;
+      margin-top: 2rem;
+      padding-top: 2rem;
+      border-top: 1px solid #f1f5f9;
+    }
+
+    .trust-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    .trust-item i {
+      color: #10b981;
+    }
+
+    /* Loading State */
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255, 255, 255, 0.95);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      backdrop-filter: blur(5px);
+    }
+
+    .loading-overlay.show {
+      display: flex;
+    }
+
+    .loading-content {
+      text-align: center;
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 3px solid #f3f4f6;
+      border-top: 3px solid #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1rem;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Messages */
+    .message {
+      padding: 1rem 1.25rem;
+      border-radius: 12px;
+      margin-bottom: 1.5rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: none;
+      border-left: 4px solid;
+    }
+
+    .message.show {
+      display: block;
+      animation: slideIn 0.3s ease-out;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .message.error {
+      background: #fef2f2;
+      color: #dc2626;
+      border-left-color: #dc2626;
+    }
+
+    .message.success {
+      background: #f0fdf4;
+      color: #16a34a;
+      border-left-color: #16a34a;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 991.98px) {
+      .hero-panel {
+        order: 2;
+        min-height: 50vh;
+      }
+      
+      .login-panel {
+        order: 1;
+        min-height: 50vh;
+      }
+      
+      .hero-title {
+        font-size: 2.5rem;
+      }
+      
+      .feature-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+      
+      .stats-row {
+        flex-direction: column;
+        gap: 1.5rem;
+        text-align: center;
+      }
+      
+      .trust-indicators {
+        flex-direction: column;
+        gap: 1rem;
+      }
+    }
+
+    @media (max-width: 767.98px) {
+      .hero-content {
+        padding: 2rem 1.5rem;
+      }
+      
+      .login-panel {
+        padding: 1.5rem;
+      }
+      
+      .hero-title {
+        font-size: 2rem;
+      }
+      
+      .login-title {
+        font-size: 2rem;
+      }
+      
+      .hero-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 20px;
+      }
+      
+      .hero-icon i {
+        font-size: 2.5rem;
+      }
+    }
+
+    @media (max-width: 575.98px) {
+      .hero-content {
+        padding: 1.5rem 1rem;
+      }
+      
+      .login-panel {
+        padding: 1rem;
+      }
+      
+      .feature-item {
+        padding: 1rem;
+      }
+      
+      .stats-row {
+        margin-top: 2rem;
+        padding-top: 2rem;
+      }
+    }
+
+    /* Dark mode support */
+    @media (prefers-color-scheme: dark) {
+      .login-panel {
+        background: #1a202c;
+        color: #e2e8f0;
+      }
+      
+      .login-title {
+        color: #f7fafc;
+      }
+      
+      .divider span {
+        background: #1a202c;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay" class="loading-overlay">
+    <div class="loading-content">
+      <div class="spinner"></div>
+      <p>Signing you in...</p>
+    </div>
+  </div>
+
+  <div class="login-wrapper">
+    <!-- Left Panel - Hero Section -->
+    <div class="col-lg-7 hero-panel d-flex">
+      <div class="hero-content">
+        <div class="hero-icon">
+          <i class="fas fa-chart-line"></i>
+        </div>
+        
+        <h1 class="hero-title">Text Analyzer</h1>
+        <p class="hero-subtitle">
+          Transform your text into actionable insights with our advanced AI-powered analysis tools
+        </p>
+        
+        <div class="feature-grid">
+          <div class="feature-item">
+            <i class="fas fa-bolt"></i>
+            <h4>Lightning Fast</h4>
+            <p>Process thousands of words in seconds with our optimized algorithms</p>
+          </div>
+          <div class="feature-item">
+            <i class="fas fa-shield-alt"></i>
+            <h4>Enterprise Security</h4>
+            <p>Bank-level encryption ensures your data stays private and secure</p>
+          </div>
+          <div class="feature-item">
+            <i class="fas fa-brain"></i>
+            <h4>AI-Powered</h4>
+            <p>Advanced machine learning models for deeper text understanding</p>
+          </div>
+          <div class="feature-item">
+            <i class="fas fa-globe"></i>
+            <h4>Multi-Language</h4>
+            <p>Support for 50+ languages with real-time translation capabilities</p>
+          </div>
+        </div>
+        
+        <div class="stats-row">
+          <div class="stat-item">
+            <span class="stat-number">50K+</span>
+            <span class="stat-label">Users</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">1M+</span>
+            <span class="stat-label">Texts Analyzed</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">99.9%</span>
+            <span class="stat-label">Uptime</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Panel - Login Form -->
+    <div class="col-lg-5 login-panel d-flex">
+      <div class="login-form-container">
+        <div class="login-header">
+          <h2 class="login-title">Welcome Back</h2>
+          <p class="login-subtitle">Sign in to continue your text analysis journey</p>
+        </div>
+
+        <!-- Messages -->
+        <div id="message" class="message"></div>
+
+        <!-- Google Sign-In -->
+        <div class="google-signin-wrapper">
+          <div id="g_id_onload"
+               data-client_id="<%= googleClientId %>"
+               data-login_uri="/auth/google/callback"
+               data-auto_prompt="false">
+          </div>
+
+          <div class="g_id_signin"
+               data-type="standard"
+               data-size="large"
+               data-theme="outline"
+               data-text="signin_with"
+               data-shape="rectangular"
+               data-logo_alignment="left"
+               data-width="400">
+          </div>
+        </div>
+
+        <div class="divider">
+          <span>Why professionals choose us</span>
+        </div>
+
+        <!-- Benefits List -->
+        <ul class="benefits-list">
+          <li><i class="fas fa-check-circle"></i> Advanced sentiment analysis and emotion detection</li>
+          <li><i class="fas fa-check-circle"></i> Real-time collaboration and team workspaces</li>
+          <li><i class="fas fa-check-circle"></i> Export results in multiple formats (PDF, Excel, JSON)</li>
+          <li><i class="fas fa-check-circle"></i> API access for seamless integration</li>
+          <li><i class="fas fa-check-circle"></i> 24/7 priority support and custom training</li>
+        </ul>
+
+        <!-- Trust Indicators -->
+        <div class="trust-indicators">
+          <div class="trust-item">
+            <i class="fas fa-lock"></i>
+            <span>SOC 2 Certified</span>
+          </div>
+          <div class="trust-item">
+            <i class="fas fa-award"></i>
+            <span>GDPR Compliant</span>
+          </div>
+          <div class="trust-item">
+            <i class="fas fa-star"></i>
+            <span>4.9/5 Rating</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    let isLoading = false;
+
+    function showMessage(text, type = 'error') {
+      const messageEl = document.getElementById('message');
+      messageEl.innerHTML = `<i class="fas fa-${type === 'error' ? 'exclamation-triangle' : 'check-circle'}"></i> ${text}`;
+      messageEl.className = `message ${type} show`;
+      
+      setTimeout(() => {
+        messageEl.classList.remove('show');
+      }, 6000);
+    }
+
+    function showLoader() {
+      if (isLoading) return;
+      isLoading = true;
+      document.getElementById('loadingOverlay').classList.add('show');
+    }
+
+    function hideLoader() {
+      isLoading = false;
+      document.getElementById('loadingOverlay').classList.remove('show');
+    }
+
+    function handleCredentialResponse(response) {
+      if (isLoading) return;
+      
+      console.log("Encoded JWT ID token: " + response.credential);
+      showLoader();
+
+      // Send token to server for verification
+      fetch('/auth/google/callback', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({ id_token: response.credential })
+      })
+      .then(res => {
+        if (!res.ok) {
+          throw new Error(`Authentication failed (${res.status})`);
+        }
+        return res.json();
+      })
+      .then(data => {
+        hideLoader();
+        if (data.success) {
+          showMessage('Welcome! Redirecting to your dashboard...', 'success');
+          setTimeout(() => {
+            window.location.href = data.redirect || '/dashboard';
+          }, 2000);
+        } else {
+          showMessage(data.message || 'Authentication failed. Please try again.');
+        }
+      })
+      .catch(err => {
+        hideLoader();
+        console.error('Login error:', err);
+        showMessage('Unable to connect to authentication service. Please try again.');
+      });
+    }
+
+    // Initialize Google Sign-In
+    window.onload = function () {
+      google.accounts.id.initialize({
+        client_id: "<%= googleClientId %>",
+        callback: handleCredentialResponse,
+        auto_select: false,
+        cancel_on_tap_outside: false,
+        use_fedcm_for_prompt: false
+      });
+
+      // Render the sign-in button
+      google.accounts.id.renderButton(
+        document.querySelector('.g_id_signin'),
+        { 
+          theme: "outline", 
+          size: "large",
+          width: "400",
+          text: "signin_with",
+          shape: "rectangular",
+          logo_alignment: "left"
+        }
+      );
+
+      // Add smooth scrolling for mobile
+      if (window.innerWidth <= 768) {
+        document.querySelector('.g_id_signin').addEventListener('click', () => {
+          setTimeout(() => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }, 100);
+        });
+      }
+
+      // Add some interactive elements
+      const featureItems = document.querySelectorAll('.feature-item');
+      featureItems.forEach(item => {
+        item.addEventListener('mouseenter', () => {
+          item.style.transform = 'translateY(-5px) scale(1.02)';
+        });
+        
+        item.addEventListener('mouseleave', () => {
+          item.style.transform = 'translateY(-3px) scale(1)';
+        });
+      });
+
+      // Animate stats on scroll (for mobile)
+      const observerOptions = {
+        threshold: 0.5,
+        rootMargin: '0px 0px -50px 0px'
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const numbers = entry.target.querySelectorAll('.stat-number');
+            numbers.forEach(num => {
+              num.style.animation = 'none';
+              setTimeout(() => {
+                num.style.animation = 'pulse 2s ease-in-out';
+              }, 100);
+            });
+          }
+        });
+      }, observerOptions);
+
+      const statsRow = document.querySelector('.stats-row');
+      if (statsRow) {
+        observer.observe(statsRow);
+      }
+    };
+
+    // Add pulse animation
+    const pulseStyle = document.createElement('style');
+    pulseStyle.textContent = `
+      @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+      }
+    `;
+    document.head.appendChild(pulseStyle);
+  </script>
+</body>
+</html>

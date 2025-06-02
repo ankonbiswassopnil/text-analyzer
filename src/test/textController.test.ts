@@ -4,7 +4,14 @@ import { pool } from '../config/database';
 
 describe('Text Controller', () => {
   beforeAll(async () => {
-    await pool.query('CREATE TABLE IF NOT EXISTS texts (id SERIAL PRIMARY KEY, content TEXT NOT NULL)');
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS texts (
+        id SERIAL PRIMARY KEY,
+        content TEXT NOT NULL,
+        user_id INTEGER NOT NULL,
+        created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
   });
 
   beforeEach(async () => {
@@ -17,12 +24,5 @@ describe('Text Controller', () => {
 
   test('App should be defined', () => {
     expect(app).toBeDefined();
-  });
-
-  test('POST /texts - should 404 until implemented', async () => {
-    const response = await request(app)
-      .post('/texts')
-      .send({ content: 'Test content' });
-    expect(response.status).toBe(404); // Expecting 404 since route doesn't exist yet
   });
 });
