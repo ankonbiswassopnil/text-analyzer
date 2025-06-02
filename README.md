@@ -151,39 +151,42 @@ pm2 stop text-analyzer
 ## 📁 Project Structure
 
 ```
-text-analyzer/
-├── 📁 config/
-│   ├── database.js          # Database configuration
-│   └── oauth.js             # Google OAuth setup
-├── 📁 controllers/
-│   ├── authController.js    # Authentication logic
-│   └── textController.js    # Text analysis logic
-├── 📁 middleware/
-│   ├── auth.js              # JWT verification middleware
-│   └── validation.js        # Input validation
-├── 📁 models/
-│   └── User.js              # User model
-├── 📁 routes/
-│   ├── auth.js              # Authentication routes
-│   ├── api.js               # API routes
-│   └── index.js             # Main routes
-├── 📁 views/
-│   ├── layouts/
-│   │   └── main.ejs         # Main layout template
-│   ├── dashboard.ejs        # User dashboard
-│   ├── login.ejs            # Login page
-│   └── analyze.ejs          # Text analysis page
-├── 📁 public/
-│   ├── css/
-│   ├── js/
-│   └── images/
-├── 📁 utils/
-│   ├── textAnalyzer.js      # Text analysis utilities
-│   └── tokenManager.js      # JWT utilities
-├── app.js                   # Express app setup
-├── server.js                # Server entry point
+text-analyzer
+├──📁src
+│   ├── 📁 config/
+│   │   └── database.ts                  # Database configuration
+│   ├── 📁 controllers/
+│   │   ├── authController.ts            # Authentication logic
+│   │   └── textController.ts            # Text analysis logic
+│   ├── 📁 middleware/
+│   │   ├── authenticateJWT.ts           # JWT verification middleware
+│   │   └── validateRequest.ts           # Input validation
+│   ├── 📁 models/
+│   │   ├── textModel.ts                 # Text model
+│   │   └── userModel.ts                 # User model
+│   ├── 📁 routes/
+│   │   ├── auth.ts                      # Authentication routes
+│   │   ├── textRoutes.ts                # API routes
+│   │   └── web.ts                       # Web routes
+│   ├── 📁 services/
+│   │   └── textAnalysisService.ts       # Text analysis service
+│   ├── 📁 test/
+│   │   ├── authController.test.ts       # Auth Controller Test
+│   │   ├── textAnalysis.test.ts         # Text Analysis Service Test
+│   │   ├── textController.test.ts       # Text Controller Service Test
+│   │   ├── textModel.test.ts            # Text Model Test
+│   │   ├── textValidation.test.ts       # Text Validation Test
+│   │   └── userModel.test.ts            # User Model Test
+│   ├── 📁 validators/
+│   │   └── textValidators.ts            # Validator Rules
+│   ├── 📁 views/
+│   │   ├── dashboard.ejs                # Dashboard Page
+│   │   └── login.ejs                    # Login page
+│   ├── app.ts                           # Express app setup
+│   └── server.ts                        # Server entry point
 ├── package.json
-└── .env.example
+├── tsconfig.json
+└── jest.config.js
 ```
 
 ---
@@ -197,15 +200,22 @@ text-analyzer/
 | `GET` | `/auth/google` | Initiate Google OAuth |
 | `GET` | `/auth/google/callback` | Google OAuth callback |
 | `POST` | `/auth/logout` | User logout |
-| `GET` | `/auth/me` | Get current user info |
 
 ### Text Analysis Routes
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `POST` | `/api/analyze` | Analyze text content |
-| `GET` | `/api/history` | Get analysis history |
-| `DELETE` | `/api/history/:id` | Delete analysis record |
+| `POST` | `/api/texts` | Create new text content |
+| `GET` | `/api/texts/:id` | Get specific text by ID |
+| `PUT` | `/api/texts/:id` | Update existing text content |
+| `DELETE` | `/api/texts/:id` | Delete text by ID |
+| `GET` | `/api/texts/:id/analysis` | Get analysis for specific text |
+
+### Text Analysis Routes
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/dashboard` | User dashboard |
 
 
 ---
