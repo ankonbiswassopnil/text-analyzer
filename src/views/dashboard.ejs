@@ -422,28 +422,40 @@
     const textInput = document.getElementById('textInput');
 
     function updateUIFromAPI(analysis) {
-        document.getElementById('charCount').textContent = `${analysis.charCount || 0} characters`;
+        // Character counts
+        document.getElementById('charCount').textContent = `${analysis.charCount ?? 0} characters`;
+        document.getElementById('charWithSpaces').textContent = analysis.charCount ?? '';
+        document.getElementById('charWithoutSpaces').textContent = analysis.charCountWithoutSpaces ?? '';
+
+        // Basic stats
         document.getElementById('wordCount').textContent = analysis.wordCount ?? '';
         document.getElementById('sentenceCount').textContent = analysis.sentenceCount ?? '';
         document.getElementById('paragraphCount').textContent = analysis.paragraphCount ?? '';
-        document.getElementById('charWithSpaces').textContent = analysis.charCount ?? '';
-        document.getElementById('charWithoutSpaces').textContent = ''; // not in current API
-        document.getElementById('avgWordsPerSentence').textContent = ''; // not in current API
-        document.getElementById('avgCharsPerWord').textContent = ''; // not in current API
-        document.getElementById('commonWord').textContent = ''; // not in current API
-        document.getElementById('readabilityScore').textContent = ''; // not in current API
 
+        // Averages
+        document.getElementById('avgWordsPerSentence').textContent = analysis.avgWordsPerSentence?.toFixed(2) ?? '';
+        document.getElementById('avgCharsPerWord').textContent = analysis.avgCharsPerWord?.toFixed(2) ?? '';
+
+        // Most common word
+        document.getElementById('commonWord').textContent = analysis.mostCommonWord ?? '';
+
+        // Readability score
+        document.getElementById('readabilityScore').textContent = analysis.readabilityScore?.toFixed(2) ?? '';
+
+        // Longest words
         if (analysis.longestWords && analysis.longestWords.length > 0) {
             document.getElementById('longestWords').textContent = analysis.longestWords.join(', ');
         } else {
             document.getElementById('longestWords').textContent = '';
         }
 
-        document.getElementById('readTime').textContent = analysis.wordCount ? Math.ceil(analysis.wordCount / 200) : '';
+        // Estimated read time (assume 200 words per minute)
+        document.getElementById('readTime').textContent = analysis.wordCount ? `${Math.ceil(analysis.wordCount / 200)} min` : '';
     }
 
     async function analyzeText() {
-        const text = textInput.value.trim();
+        const text = textInput.value;
+        console.log('Analyzing text:', text);
         if (!text) {
             alert('Please enter some text to analyze.');
             return;
