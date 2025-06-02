@@ -9,8 +9,13 @@ describe('UserModel', () => {
     avatar_url: 'https://example.com/avatar.jpg',
   };
 
+  // Clean up before tests to avoid duplicates
+  beforeAll(async () => {
+    await pool.query('DELETE FROM users WHERE google_id = $1 OR email = $2', [testUser.google_id, testUser.email]);
+  });
+
   afterAll(async () => {
-    await pool.query('DELETE FROM users WHERE google_id = $1', [testUser.google_id]);
+    await pool.query('DELETE FROM users WHERE google_id = $1 OR email = $2', [testUser.google_id, testUser.email]);
     await pool.end();
   });
 
