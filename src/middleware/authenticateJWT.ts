@@ -31,6 +31,7 @@ export const authenticateJWT = (req: Request, res: Response, next: NextFunction)
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET || '822739985192');
     req.user = decoded;
+    req.user.token = token; // Store the token in the request object for later use
     next();
   } catch (error) {
     console.error('JWT verification error:', error);

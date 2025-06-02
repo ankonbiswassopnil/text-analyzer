@@ -406,132 +406,139 @@
                     <span class="metric-label">Most common word</span>
                     <span class="metric-value" id="commonWord">-</span>
                 </div>
+                <div class="metric-row">
+                    <span class="metric-label">Longest Words</span>
+                    <span class="metric-value" id="longestWords">-</span>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        const textInput = document.getElementById('textInput');
-        const charCount = document.getElementById('charCount');
-        
-        // Real-time character counting
-        textInput.addEventListener('input', updateStats);
-        
-        function updateStats() {
-            const text = textInput.value;
-            const chars = text.length;
-            const words = text.trim() ? text.trim().split(/\s+/).length : 0;
-            const sentences = text.trim() ? text.split(/[.!?]+/).filter(s => s.trim().length > 0).length : 0;
-            const paragraphs = text.trim() ? text.split(/\n\s*\n/).filter(p => p.trim().length > 0).length : 0;
-            const readTime = Math.ceil(words / 200); // Average reading speed
-            
-            charCount.textContent = `${chars} characters`;
-            document.getElementById('wordCount').textContent = words;
-            document.getElementById('sentenceCount').textContent = sentences;
-            document.getElementById('paragraphCount').textContent = paragraphs;
-            document.getElementById('readTime').textContent = readTime;
-            
-            // Update detailed stats
-            document.getElementById('charWithSpaces').textContent = chars;
-            document.getElementById('charWithoutSpaces').textContent = text.replace(/\s/g, '').length;
-            document.getElementById('avgWordsPerSentence').textContent = sentences > 0 ? (words / sentences).toFixed(1) : '0';
-            document.getElementById('avgCharsPerWord').textContent = words > 0 ? (text.replace(/\s/g, '').length / words).toFixed(1) : '0';
-        }
-        
-        function analyzeText() {
-            const text = textInput.value;
-            if (!text.trim()) {
-                alert('Please enter some text to analyze.');
-                return;
-            }
-            
-            // Advanced analysis
-            const words = text.toLowerCase().match(/\b\w+\b/g) || [];
-            const wordFreq = {};
-            words.forEach(word => wordFreq[word] = (wordFreq[word] || 0) + 1);
-            
-            const mostCommon = Object.keys(wordFreq).reduce((a, b) => wordFreq[a] > wordFreq[b] ? a : b, '');
-            document.getElementById('commonWord').textContent = mostCommon || '-';
-            
-            // Simple readability score (Flesch Reading Ease approximation)
-            const avgSentenceLength = words.length / (text.split(/[.!?]+/).filter(s => s.trim().length > 0).length || 1);
-            const avgSyllables = words.reduce((acc, word) => acc + countSyllables(word), 0) / words.length;
-            const readabilityScore = 206.835 - (1.015 * avgSentenceLength) - (84.6 * avgSyllables);
-            
-            document.getElementById('readabilityScore').textContent = readabilityScore.toFixed(1);
-            
-            // Smooth scroll to results
-            document.querySelector('.analysis-results').scrollIntoView({ behavior: 'smooth' });
-        }
-        
-        function countSyllables(word) {
-            word = word.toLowerCase();
-            if (word.length <= 3) return 1;
-            word = word.replace(/(?:[^laeiouy]es|ed|[^laeiouy]e)$/, '');
-            word = word.replace(/^y/, '');
-            const matches = word.match(/[aeiouy]{1,2}/g);
-            return matches ? matches.length : 1;
-        }
-        
-        function clearText() {
-            textInput.value = '';
-            updateStats();
-        }
-        
-        function exportResults() {
-            const text = textInput.value;
-            if (!text.trim()) {
-                alert('No text to export.');
-                return;
-            }
-            
-            const results = {
-                text: text,
-                stats: {
-                    characters: text.length,
-                    charactersNoSpaces: text.replace(/\s/g, '').length,
-                    words: text.trim().split(/\s+/).length,
-                    sentences: text.split(/[.!?]+/).filter(s => s.trim().length > 0).length,
-                    paragraphs: text.split(/\n\s*\n/).filter(p => p.trim().length > 0).length,
-                    readingTime: Math.ceil(text.trim().split(/\s+/).length / 200)
-                }
-            };
-            
-            const blob = new Blob([JSON.stringify(results, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'text-analysis-results.json';
-            a.click();
-            URL.revokeObjectURL(url);
+    const baseUrl = 'http://localhost/api';
+    const rawToken = '<%= user.token %>';
+    const token = `Bearer ${rawToken}`;
+
+    const textInput = document.getElementById('textInput');
+
+    function updateUIFromAPI(analysis) {
+        document.getElementById('charCount').textContent = `${analysis.charCount || 0} characters`;
+        document.getElementById('wordCount').textContent = analysis.wordCount ?? '';
+        document.getElementById('sentenceCount').textContent = analysis.sentenceCount ?? '';
+        document.getElementById('paragraphCount').textContent = analysis.paragraphCount ?? '';
+        document.getElementById('charWithSpaces').textContent = analysis.charCount ?? '';
+        document.getElementById('charWithoutSpaces').textContent = ''; // not in current API
+        document.getElementById('avgWordsPerSentence').textContent = ''; // not in current API
+        document.getElementById('avgCharsPerWord').textContent = ''; // not in current API
+        document.getElementById('commonWord').textContent = ''; // not in current API
+        document.getElementById('readabilityScore').textContent = ''; // not in current API
+
+        if (analysis.longestWords && analysis.longestWords.length > 0) {
+            document.getElementById('longestWords').textContent = analysis.longestWords.join(', ');
+        } else {
+            document.getElementById('longestWords').textContent = '';
         }
 
-        function logout() {
-            if (confirm('Are you sure you want to logout?')) {
-                // In a real application, this would redirect to your logout endpoint
-                // For now, we'll just simulate a logout
-                alert('Logging out...');
-                // window.location.href = '/logout';
-            }
+        document.getElementById('readTime').textContent = analysis.wordCount ? Math.ceil(analysis.wordCount / 200) : '';
+    }
+
+    async function analyzeText() {
+        const text = textInput.value.trim();
+        if (!text) {
+            alert('Please enter some text to analyze.');
+            return;
         }
-        
-        // File upload handling
-        document.getElementById('fileInput').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file && file.type === 'text/plain') {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    textInput.value = e.target.result;
-                    updateStats();
-                };
-                reader.readAsText(file);
-            } else if (file) {
-                alert('Please upload a .txt file for now. Other formats coming soon!');
+
+        try {
+            // Step 1: Create the text entry
+            const createRes = await fetch(`${baseUrl}/texts`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `${token}`
+                },
+                body: JSON.stringify({ content: text })
+            });
+
+            if (!createRes.ok) {
+                const errorText = await createRes.text();
+                console.error('Create Text API failed:', createRes.status, errorText);
+                alert('Text creation failed. Please check API and token.');
+                return;
             }
-        });
-        
-        // Initialize
-        updateStats();
-    </script>
+
+            const createData = await createRes.json();
+            console.log('Create Response Status:', createRes.status);
+            console.log('Create Response Data:', createData);
+
+            if (!createData.status || !createData.data?.id) {
+                throw new Error('Failed to create text.');
+            }
+
+            const textId = createData.data.id;
+            console.log('Created Text ID:', `${baseUrl}/texts/${textId}/analysis`);
+
+            // Step 2: Fetch analysis
+            const analysisRes = await fetch(`${baseUrl}/texts/${textId}/analysis`, {
+                headers: {
+                    'Authorization': `${token}`
+                }
+            });
+
+            const analysisData = await analysisRes.json();
+            console.log('Analysis Response Status:', analysisRes.status);
+            console.log('Analysis Data:', analysisData);
+
+            if (!analysisData.status || !analysisData.data) {
+                throw new Error('Failed to get analysis.');
+            }
+
+            // Step 3: Update UI
+            updateUIFromAPI(analysisData.data);
+
+            // Smooth scroll to results
+            document.querySelector('.analysis-results').scrollIntoView({ behavior: 'smooth' });
+
+        } catch (err) {
+            console.error('Error analyzing text:', err);
+            alert('An error occurred while analyzing text.');
+        }
+    }
+
+    function clearText() {
+        textInput.value = '';
+        document.getElementById('charCount').textContent = '';
+        document.getElementById('wordCount').textContent = '';
+        document.getElementById('sentenceCount').textContent = '';
+        document.getElementById('paragraphCount').textContent = '';
+        document.getElementById('charWithSpaces').textContent = '';
+        document.getElementById('charWithoutSpaces').textContent = '';
+        document.getElementById('avgWordsPerSentence').textContent = '';
+        document.getElementById('avgCharsPerWord').textContent = '';
+        document.getElementById('commonWord').textContent = '';
+        document.getElementById('readabilityScore').textContent = '';
+        document.getElementById('longestWords').textContent = '';
+        document.getElementById('readTime').textContent = '';
+    }
+
+    function logout() {
+        if (confirm('Are you sure you want to logout?')) {
+            alert('Logging out...');
+        }
+    }
+
+    document.getElementById('fileInput').addEventListener('change', function (e) {
+        const file = e.target.files[0];
+        if (file && file.type === 'text/plain') {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                textInput.value = e.target.result;
+            };
+            reader.readAsText(file);
+        } else if (file) {
+            alert('Please upload a .txt file for now. Other formats coming soon!');
+        }
+    });
+</script>
 </body>
 </html>
