@@ -63,57 +63,6 @@ cd text-analyzer
 npm install
 ```
 
-### 3. Environment Setup
-
-Create a `.env` file in the root directory:
-
-```env
-# Server Configuration
-PORT=3000
-NODE_ENV=development
-
-# Database Configuration
-DATABASE_URL=postgresql://username:password@localhost:5432/text_analyzer_db
-
-# Google OAuth2 Credentials
-GOOGLE_CLIENT_ID=your_google_client_id_here
-GOOGLE_CLIENT_SECRET=your_google_client_secret_here
-GOOGLE_REDIRECT_URI=http://localhost:3000/auth/google/callback
-
-# JWT Configuration
-JWT_SECRET=your_super_secret_jwt_key_here
-JWT_EXPIRES_IN=7d
-
-# Cookie Configuration
-COOKIE_SECRET=your_cookie_secret_here
-```
-
-### 4. Database Setup
-
-Create the PostgreSQL database and run migrations:
-
-```bash
-# Create database
-createdb text_analyzer_db
-
-# Run database migrations (if using a migration tool)
-npm run migrate
-
-# Or manually create tables using your preferred method
-```
-
-### 5. Google OAuth2 Setup
-
-1. Go to [Google Cloud Console](https://console.cloud.google.com/)
-2. Create a new project or select existing one
-3. Enable the Google+ API
-4. Create OAuth2 credentials
-5. Add authorized redirect URIs:
-   - `http://localhost:3000/auth/google/callback` (development)
-   - `https://yourdomain.com/auth/google/callback` (production)
-
----
-
 ## 🚀 Running the Project
 
 ### Development Mode
@@ -122,7 +71,7 @@ npm run migrate
 npm run dev
 ```
 
-The server will start on `http://localhost:3000` with hot reloading enabled.
+The server will start on `http://localhost` with hot reloading enabled.
 
 ### Production Mode
 
